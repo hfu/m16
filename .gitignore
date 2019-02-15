@@ -1,3 +1,5 @@
+pbf/*.pbf
+
 # Logs
 logs
 *.log

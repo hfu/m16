@@ -18,5 +18,5 @@ node produce.js
 ```javascript
 const m16 = require('../m16')
 
-m16.path(6, 37, 32) => '../m16/pbf/2-2-2.pbf'
+m16.path(6, 37, 32) => '../m16/pbf/2-2-2.osm.pbf'
 ```
