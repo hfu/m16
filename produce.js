@@ -1,6 +1,7 @@
 const config = require('config')
 const { spawn } = require('child_process')
 const tilebelt = require('@mapbox/tilebelt')
+const fs = require('fs')
 
 const produce = (z, x, y) => {
   return new Promise((resolve, result) => {
@@ -10,6 +11,7 @@ const produce = (z, x, y) => {
     spawn('osmium', [
       'extract', '--bbox', bbox.join(','),
       '--strategy=smart', '--overwrite', '--progress',
+      '--output-format=pbf,pbf_compression=false,add_metadata=false',
       '--verbose', '--output', tmpPath,
       config.get('src')
     ], { stdio: 'inherit' })
