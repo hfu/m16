@@ -8,21 +8,25 @@ const produce = (z, x, y) => {
     const bbox = tilebelt.tileToBBOX([x, y, 2])
     const tmpPath = `pbf/part-2-${x}-${y}.osm.pbf`
     const dstPath = `pbf/2-${x}-${y}.osm.pbf`
-    spawn('osmium', [
-      'extract', '--bbox', bbox.join(','),
-      '--strategy=smart', '--overwrite', '--progress',
-      '--output-format=pbf,pbf_compression=false,add_metadata=false',
-      '--verbose', '--output', tmpPath,
-      config.get('src')
-    ], { stdio: 'inherit' })
-    .on('exit', code => {
-      if (code === 0) {
-        fs.renameSync(tmpPath, dstPath)
-      } else {
-        fs.unlink(tmpPath)
-      }
+    if (fs.existsSync(dstPath)) {
       resolve(null)
-    })
+    } else {
+      spawn('osmium', [
+        'extract', '--bbox', bbox.join(','),
+        '--strategy=smart', '--overwrite', '--progress',
+        '--output-format=pbf,pbf_compression=false,add_metadata=false',
+        '--verbose', '--output', tmpPath,
+        config.get('src')
+      ], { stdio: 'inherit' })
+      .on('exit', code => {
+        if (code === 0) {
+          fs.renameSync(tmpPath, dstPath)
+        } else {
+          fs.unlink(tmpPath)
+        }
+        resolve(null)
+      })
+    }
   })
 }
 
