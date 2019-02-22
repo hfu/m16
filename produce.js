@@ -3,20 +3,20 @@ const { spawn } = require('child_process')
 const tilebelt = require('@mapbox/tilebelt')
 const fs = require('fs')
 
-const produce = (z, x, y) => {
+const produce = (z, x, y, srcPath) => {
   return new Promise((resolve, result) => {
-    const bbox = tilebelt.tileToBBOX([x, y, 2])
-    const tmpPath = `pbf/part-2-${x}-${y}.osm.pbf`
-    const dstPath = `pbf/2-${x}-${y}.osm.pbf`
-    if (fs.existsSync(dstPath)) {
+    const bbox = tilebelt.tileToBBOX([x, y, z])
+    const tmpPath = `pbf/part-${z}-${x}-${y}.osm.pbf`
+    const dstPath = `pbf/${z}-${x}-${y}.osm.pbf`
+    if (false && fs.existsSync(dstPath)) {
+      console.log(`${dstPath} is already there.`)
       resolve(null)
     } else {
       spawn('osmium', [
         'extract', '--bbox', bbox.join(','),
         '--strategy=smart', '--overwrite', '--progress',
         '--output-format=pbf,pbf_compression=false,add_metadata=false',
-        '--verbose', '--output', tmpPath,
-        config.get('src')
+        '--verbose', '--output', tmpPath, srcPath
       ], { stdio: 'inherit' })
       .on('exit', code => {
         if (code === 0) {
@@ -31,11 +31,20 @@ const produce = (z, x, y) => {
 }
 
 const main = async () => {
+  
+  await produce(4, 9, 7, config.get('src'))
+  return
+
   for (x = 0; x < 4; x++) {
     for (y = 0; y < 4; y++) {
-      await produce(2, x, y)
+      await produce(2, x, y, config.get('src'))
     }
   }
+  for (x = 8; x < 12; x++) {
+    for (y = 4; y < 8; y++) {
+      await produce(4, x, y, 'pbf/2-2-1.osm.pbf')
+    }
+  } 
 }
 
 main()
